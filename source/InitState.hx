@@ -26,10 +26,13 @@ class InitState extends FlxState
 	static function getFileSystem():IFileSystem
 	{
 		#if sys
+		trace('sys file system');
 		return new SysFileSystem({modRoot: modDir});
 		#elseif nodefs
+		trace('node file system');
 		return new NodeFileSystem({modRoot: modDir});
 		#else
+		trace('memory file system');
 		return new MemoryFileSystem({modRoot: modDir});
 		#end
 	}
@@ -60,8 +63,10 @@ class InitState extends FlxState
 		var framework =
 			#if nodefs
 			Framework.OPENFL_WITH_NODE;
+			trace('openfl with node framework');
 			#else
 			Framework.OPENFL;
+			trace('openfl framework');
 			#end
 
 		var results = Polymod.init({
