@@ -34,8 +34,8 @@
 
 	<source path="source" />
 	<assets path="site" />
-	
-	<assets path="mods" if="debug"/>
+
+	<assets path="testing_mods" rename="mods" if="debug"/>
 
 	<!-- _______________________________ Libraries ______________________________ -->
 
