@@ -49,6 +49,7 @@ class InitState extends FlxState
 				return;
 
 			dirs = getFileSystem().readDirectory(modDir);
+			trace(dirs);
 		}
 		catch (e)
 		{
