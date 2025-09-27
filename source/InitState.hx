@@ -21,7 +21,11 @@ class InitState extends FlxState
 			#if nodefs
 			new NodeFileSystem({modRoot: modDir}).readDirectory(modDir);
 			#else
+			#if cpp
 			sys.FileSystem.readDirectory(modDir);
+			#else
+			[];
+			#end
 			#end
 
 		loadMods([]);
