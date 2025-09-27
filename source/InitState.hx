@@ -2,27 +2,36 @@ package;
 
 import flixel.FlxState;
 import polymod.Polymod;
+import polymod.fs.PolymodFileSystem.IFileSystem;
+#if sys
+import polymod.fs.SysFileSystem;
+#elseif nodefs
+import polymod.fs.NodeFileSystem;
+#else
+import polymod.fs.MemoryFileSystem;
+#end
 
 class InitState extends FlxState
 {
-	var modDir:String = 'mods';
+	public static var modDir:String = 'mods';
+	public static var fileSystem:IFileSystem;
 
 	override public function create()
 	{
 		super.create();
 
-		var mods =
-			#if nodefs
-			new NodeFileSystem({modRoot: modDir}).readDirectory(modDir);
-			#else
-			#if cpp
-			sys.FileSystem.readDirectory(modDir);
-			#else
-			[];
-			#end
-			#end
+		loadMods();
+	}
 
-		loadMods(mods);
+	static function getFileSystem():IFileSystem
+	{
+		#if sys
+		return new SysFileSystem({modRoot: modDir});
+		#elseif nodefs
+		return new NodeFileSystem({modRoot: modDir});
+		#else
+		return new MemoryFileSystem({modRoot: modDir});
+		#end
 	}
 
 	override public function update(elapsed:Float)
@@ -30,8 +39,23 @@ class InitState extends FlxState
 		super.update(elapsed);
 	}
 
-	public function loadMods(dirs:Array<String>)
+	public function loadMods()
 	{
+		var dirs:Array<String> = [];
+
+		try
+		{
+			if (!getFileSystem().exists(modDir))
+				return;
+
+			dirs = getFileSystem().readDirectory(modDir);
+		}
+		catch (e)
+		{
+			trace(e);
+			return;
+		}
+
 		var framework =
 			#if nodefs
 			Framework.OPENFL_WITH_NODE;
@@ -46,7 +70,14 @@ class InitState extends FlxState
 			ignoredFiles: Polymod.getDefaultIgnoreList(),
 			framework: framework,
 			assetPrefix: '',
+			useScriptedClasses: true,
+			loadScriptsAsync: #if html5 true #else false #end
 		});
+
+		for (mod in results)
+		{
+			trace('Found mod: ${mod.id}');
+		}
 	}
 
 	public function onError(error:PolymodError)
