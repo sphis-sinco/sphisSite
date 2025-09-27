@@ -5,9 +5,24 @@ import polymod.Polymod;
 
 class InitState extends FlxState
 {
+	var modDir:String =
+		#if mac
+		// account for <APPLICATION>.app/Contents/Resources
+		'../../../../../../mods';
+		#else
+		'../../../mods';
+		#end
+
 	override public function create()
 	{
 		super.create();
+
+		var mods =
+			#if nodefs
+			new NodeFileSystem({modRoot: modDir}).readDirectory(modDir);
+			#else
+			sys.FileSystem.readDirectory(modDir);
+			#end
 
 		loadMods([]);
 	}
@@ -19,18 +34,15 @@ class InitState extends FlxState
 
 	public function loadMods(dirs:Array<String>)
 	{
-		#if nodefs
-		var framework = Framework.OPENFL_WITH_NODE;
-		#else
-		var framework = Framework.OPENFL;
-		#end
-		var modRoot = '../../../mods/';
-		#if mac
-		// account for <APPLICATION>.app/Contents/Resources
-		var modRoot = '../../../../../../mods';
-		#end
+		var framework =
+			#if nodefs
+			Framework.OPENFL_WITH_NODE;
+			#else
+			Framework.OPENFL;
+			#end
+
 		var results = Polymod.init({
-			modRoot: modRoot,
+			modRoot: modDir,
 			dirs: dirs,
 			errorCallback: onError,
 			ignoredFiles: Polymod.getDefaultIgnoreList(),
