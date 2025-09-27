@@ -5,13 +5,7 @@ import polymod.Polymod;
 
 class InitState extends FlxState
 {
-	var modDir:String =
-		#if mac
-		// account for <APPLICATION>.app/Contents/Resources
-		'../../../../../../mods';
-		#else
-		'../../../mods';
-		#end
+	var modDir:String = 'mods';
 
 	override public function create()
 	{
@@ -28,7 +22,7 @@ class InitState extends FlxState
 			#end
 			#end
 
-		loadMods([]);
+		loadMods(mods);
 	}
 
 	override public function update(elapsed:Float)
